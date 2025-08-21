@@ -108,16 +108,16 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.utils import timezone
 
-class User(AbstractUser):
-    ROLE_CHOICES = (
-        ('doctor', 'Doctor'),
-        ('patient', 'Patient'),
-        ('admin', 'Admin'),
-    )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='patient')
+# class User(AbstractUser):
+#     ROLE_CHOICES = (
+#         ('doctor', 'Doctor'),
+#         ('patient', 'Patient'),
+#         ('admin', 'Admin'),
+#     )
+#     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='patient')
 
-    def __str__(self):
-        return f"{self.username} ({self.role})"
+#     def __str__(self):
+#         return f"{self.username} ({self.role})"
 
 class Patient(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='patient_profile')
@@ -134,35 +134,44 @@ class Patient(models.Model):
         return f"Patient: {self.user.username} (MRN: {self.mrn_uid or 'N/A'})"
 
 class WoundImage(models.Model):
+    # patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='wound_images')
+    # image = models.ImageField(upload_to='wound_photos/')
+    # plotted_image = models.ImageField(upload_to='wound_plots/', blank=True, null=True)
+    # capture_date = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='wound_images')
-    image = models.ImageField(upload_to='wound_photos/')
-    plotted_image = models.ImageField(upload_to='wound_plots/', blank=True, null=True)
-    capture_date = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='wound_images/')
+    plotted_image = models.ImageField(upload_to='plotted_wound_images/', null=True, blank=True,
+                                      help_text="Image with ML analysis plotted (e.g., 3D visualization, segmentation overlay)")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
     notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Wound Image {self.id} for {self.patient.user.username}"
     
     def __str__(self):
         return f"Wound Image for {self.patient.user.username} on {self.capture_date.strftime('%Y-%m-%d')}"
 
-class WoundAnalysis(models.Model):
-    wound_image = models.OneToOneField(WoundImage, on_delete=models.CASCADE, related_name='analysis')
-    is_wound = models.BooleanField(default=False)
-    rejection_reason = models.CharField(max_length=100, blank=True, null=True)
-    wound_area_cm2 = models.FloatField(blank=True, null=True)
-    estimated_depth_mm = models.FloatField(blank=True, null=True)
-    estimated_distance_cm = models.FloatField(blank=True, null=True)
-    healing_stage = models.CharField(max_length=100, blank=True, null=True)
-    tissue_type = models.CharField(max_length=100, blank=True, null=True)
-    exudate = models.CharField(max_length=100, blank=True, null=True)
-    odor = models.CharField(max_length=50, blank=True, null=True)
-    periwound_skin = models.CharField(max_length=100, blank=True, null=True)
-    potential_complications = models.JSONField(blank=True, null=True)
-    recommendations = models.JSONField(blank=True, null=True)
-    analysis_summary = models.TextField(blank=True, null=True)
-    wound_outline_coordinates = models.JSONField(blank=True, null=True)
-    analyzed_at = models.DateTimeField(auto_now_add=True)
+# class WoundAnalysis(models.Model):
+#     wound_image = models.OneToOneField(WoundImage, on_delete=models.CASCADE, related_name='analysis')
+#     is_wound = models.BooleanField(default=False)
+#     rejection_reason = models.CharField(max_length=100, blank=True, null=True)
+#     wound_area_cm2 = models.FloatField(blank=True, null=True)
+#     estimated_depth_mm = models.FloatField(blank=True, null=True)
+#     estimated_distance_cm = models.FloatField(blank=True, null=True)
+#     healing_stage = models.CharField(max_length=100, blank=True, null=True)
+#     tissue_type = models.CharField(max_length=100, blank=True, null=True)
+#     exudate = models.CharField(max_length=100, blank=True, null=True)
+#     odor = models.CharField(max_length=50, blank=True, null=True)
+#     periwound_skin = models.CharField(max_length=100, blank=True, null=True)
+#     potential_complications = models.JSONField(blank=True, null=True)
+#     recommendations = models.JSONField(blank=True, null=True)
+#     analysis_summary = models.TextField(blank=True, null=True)
+#     wound_outline_coordinates = models.JSONField(blank=True, null=True)
+#     analyzed_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Analysis for {self.wound_image}"
+#     def __str__(self):
+#         return f"Analysis for {self.wound_image}"
 
 class OTP(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='otps')
@@ -227,28 +236,28 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-class Patient(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='patient_profile')
-    date_of_birth = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=10, null=True, blank=True)
-    contact_number = models.CharField(max_length=20, null=True, blank=True)
-    address = models.TextField(null=True, blank=True)
+# class Patient(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='patient_profile')
+#     date_of_birth = models.DateField(null=True, blank=True)
+#     gender = models.CharField(max_length=10, null=True, blank=True)
+#     contact_number = models.CharField(max_length=20, null=True, blank=True)
+#     address = models.TextField(null=True, blank=True)
 
-    def __str__(self):
-        return f"Patient: {self.user.username}"
+#     def __str__(self):
+#         return f"Patient: {self.user.username}"
 
-class WoundImage(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='wound_images')
-    image = models.ImageField(upload_to='wound_images/')
-    plotted_image = models.ImageField(upload_to='plotted_wound_images/', null=True, blank=True,
-                                      help_text="Image with ML analysis plotted (e.g., 3D visualization, segmentation overlay)")
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    notes = models.TextField(blank=True, null=True)
+# class WoundImage(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='wound_images')
+#     image = models.ImageField(upload_to='wound_images/')
+#     plotted_image = models.ImageField(upload_to='plotted_wound_images/', null=True, blank=True,
+#                                       help_text="Image with ML analysis plotted (e.g., 3D visualization, segmentation overlay)")
+#     uploaded_at = models.DateTimeField(auto_now_add=True)
+#     notes = models.TextField(blank=True, null=True)
 
-    def __str__(self):
-        return f"Wound Image {self.id} for {self.patient.user.username}"
+#     def __str__(self):
+#         return f"Wound Image {self.id} for {self.patient.user.username}"
 
 class WoundAnalysis(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -259,8 +268,10 @@ class WoundAnalysis(models.Model):
     estimated_depth_mm = models.FloatField(null=True, blank=True)
     estimated_distance_cm = models.FloatField(null=True, blank=True)
     healing_stage = models.CharField(max_length=100, blank=True, null=True)
-    tissue_type = models.JSONField(blank=True, null=True,
-                                   help_text="JSON object: {'Slough': 'X%', 'Necrosis': 'Y%', ...}")
+    tissue_type = models.JSONField(max_length=100, blank=True, null=True,help_text="JSON object: {'Slough': 'X%', 'Necrosis': 'Y%', ...}")
+
+    # tissue_type = models.JSONField(blank=True, null=True,
+    #                                help_text="JSON object: {'Slough': 'X%', 'Necrosis': 'Y%', ...}")
     exudate = models.CharField(max_length=50, blank=True, null=True)
     odor = models.CharField(max_length=50, blank=True, null=True)
     periwound_skin = models.CharField(max_length=100, blank=True, null=True)
@@ -272,6 +283,7 @@ class WoundAnalysis(models.Model):
     wound_outline_coordinates = models.JSONField(blank=True, null=True,
                                                  help_text="JSON array of [x, y] coordinates for wound outline")
     analyzed_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return f"Analysis for Wound Image {self.wound_image.id}"

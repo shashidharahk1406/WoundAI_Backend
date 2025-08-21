@@ -25,15 +25,15 @@ from django.contrib.auth.admin import UserAdmin
 from .models import User, Patient, WoundImage, WoundAnalysis
 
 # Register your custom User model
-@admin.register(User)
-class CustomUserAdmin(UserAdmin):
-    fieldsets = UserAdmin.fieldsets + (
-        (('Roles', {'fields': ('role',)}),)
-    )
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        (('Roles', {'fields': ('role',)}),)
-    )
+# @admin.register(User)
+# class CustomUserAdmin(UserAdmin):
+#     fieldsets = UserAdmin.fieldsets + (
+#         (('Roles', {'fields': ('role',)}),)
+#     )
+#     add_fieldsets = UserAdmin.add_fieldsets + (
+#         (('Roles', {'fields': ('role',)}),)
+#     )
 
-admin.site.register(Patient)
-admin.site.register(WoundImage)
-admin.site.register(WoundAnalysis)
+# admin.site.register(Patient)
+# admin.site.register(WoundImage)
+# admin.site.register(WoundAnalysis)

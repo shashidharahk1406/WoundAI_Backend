@@ -1,6 +1,6 @@
 # # api/serializers.py
 
-# from rest_framework import serializers
+from rest_framework import serializers
 # from rest_framework.authtoken.models import Token
 # from django.contrib.auth import authenticate
 # from .models import Patient, WoundImage, WoundAnalysis, User, OTP
@@ -108,55 +108,55 @@
 #         fields = ['id', 'patient', 'image', 'capture_date', 'notes', 'analysis']
 #         read_only_fields = ['capture_date']
 
-# class ForgotPasswordSerializer(serializers.Serializer):
-#     """
-#     Serializer for requesting a password reset OTP.
-#     """
-#     email = serializers.EmailField(required=True)
+class ForgotPasswordSerializer(serializers.Serializer):
+    """
+    Serializer for requesting a password reset OTP.
+    """
+    email = serializers.EmailField(required=True)
 
-#     def validate_email(self, value):
-#         try:
-#             user = User.objects.get(email=value)
-#         except User.DoesNotExist:
-#             raise serializers.ValidationError("No user found with this email address.")
-#         self.user = user # Store user object for later use in view
-#         return value
+    def validate_email(self, value):
+        try:
+            user = User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("No user found with this email address.")
+        self.user = user # Store user object for later use in view
+        return value
 
-# class ResetPasswordSerializer(serializers.Serializer):
-#     """
-#     Serializer for resetting password using OTP.
-#     """
-#     email = serializers.EmailField(required=True)
-#     otp = serializers.CharField(required=True, max_length=6)
-#     new_password = serializers.CharField(write_only=True, required=True, min_length=8)
-#     confirm_new_password = serializers.CharField(write_only=True, required=True, min_length=8)
+class ResetPasswordSerializer(serializers.Serializer):
+    """
+    Serializer for resetting password using OTP.
+    """
+    email = serializers.EmailField(required=True)
+    otp = serializers.CharField(required=True, max_length=6)
+    new_password = serializers.CharField(write_only=True, required=True, min_length=8)
+    confirm_new_password = serializers.CharField(write_only=True, required=True, min_length=8)
 
-#     def validate(self, data):
-#         email = data.get('email')
-#         otp_code = data.get('otp')
-#         new_password = data.get('new_password')
-#         confirm_new_password = data.get('confirm_new_password')
+    def validate(self, data):
+        email = data.get('email')
+        otp_code = data.get('otp')
+        new_password = data.get('new_password')
+        confirm_new_password = data.get('confirm_new_password')
 
-#         try:
-#             user = User.objects.get(email=email)
-#         except User.DoesNotExist:
-#             raise serializers.ValidationError("No user found with this email address.")
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("No user found with this email address.")
 
-#         # Check if new passwords match
-#         if new_password != confirm_new_password:
-#             raise serializers.ValidationError({"new_password": "New passwords do not match."})
+        # Check if new passwords match
+        if new_password != confirm_new_password:
+            raise serializers.ValidationError({"new_password": "New passwords do not match."})
 
-#         # Check OTP validity
-#         try:
-#             otp = OTP.objects.get(user=user, code=otp_code, is_verified=False)
-#             if not otp.is_valid():
-#                 raise serializers.ValidationError("Invalid or expired OTP.")
-#         except OTP.DoesNotExist:
-#             raise serializers.ValidationError("Invalid or expired OTP.")
+        # Check OTP validity
+        try:
+            otp = OTP.objects.get(user=user, code=otp_code, is_verified=False)
+            if not otp.is_valid():
+                raise serializers.ValidationError("Invalid or expired OTP.")
+        except OTP.DoesNotExist:
+            raise serializers.ValidationError("Invalid or expired OTP.")
         
-#         data['user'] = user
-#         data['otp_instance'] = otp # Store OTP instance for verification
-#         return data
+        data['user'] = user
+        data['otp_instance'] = otp # Store OTP instance for verification
+        return data
 
 
 

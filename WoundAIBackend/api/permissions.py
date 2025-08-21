@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from WoundAIBackend.api.models import Patient, User
+# from WoundAIBackend.api.models import Patient, User
 
 class IsAdminOrDoctor(permissions.BasePermission):
     """
