@@ -297,13 +297,31 @@ WSGI_APPLICATION = 'WoundAIBackend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
+
+
+
+import pymysql
+pymysql.install_as_MySQLdb()
+
+
+DATABASES = {
+        'default': 
+            {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'WOUNDDBDEV',
+            'USER': 'gfa_user',    
+            'PASSWORD': 'gfa@123',    
+            'HOST': '35.200.190.116',    
+            'PORT': '3306',
+            }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
